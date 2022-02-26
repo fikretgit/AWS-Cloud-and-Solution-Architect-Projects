@@ -6,26 +6,45 @@ Parameters:
     Description: Select your VPC
     Type: AWS::EC2::VPC::Id
   
-  KeyName: 
+  myKP: 
     Description: Select your Key
     Type: AWS::EC2::KeyPair::KeyName
 
-
+  myIT:
+    Description: Select instance type
+    Type: String
+    Default: t2.micro 
+    AllowedValues: 
+     - t2.micro
+     - t3.micro
+     - t2.nano
+     - t3.nano
   
 Mappings:
+  RegionImageMap:
+    us-east-1:
+      AMI: ami-0dc2d3e4c0f9ebd18
+    us-east-2:
+      AMI: ami-0233c2d874b811deb
+    us-west-1:
+      AMI: ami-0ed05376b59b90e46
+    us-west-2:
+      AMI: ami-0dc8f589abe99f538
+    eu-west-1:
+      AMI: ami-058b1b7fe545997ae
+
+Resources:
   myLT:
     Type: AWS::EC2::LaunchTemplate
     Properties:
-        ImageId: "String"
-        InstanceType: "String"
-        KeyName: "String"
-        RamDiskId: "String"
+        ImageId: !FindInMap 
+          - RegionImageMap
+          - !Ref AWS::Region
+          - AMI
+        InstanceType: !Ref myIT
+        KeyName: !Ref myKP
         SecurityGroupIds:
-          -
-        SecurityGroups:
-          -
-        TagSpecifications:
-          -
+          - !GetAtt EC2SecGroup2.GroupId
         UserData: !Base64 |
           #!/bin/bash
           yum update -y
